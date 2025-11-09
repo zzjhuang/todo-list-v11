@@ -1,6 +1,7 @@
 # Angular TodoList v11 📝
 
 一個使用 Angular 11 和 Bootstrap 5 構建的現代待辦事項管理應用程式。
+第一次使用angular 框架做成的練習網站
 
 ## ✨ 功能特色
 
@@ -116,29 +117,6 @@ ng e2e
 ng lint
 ```
 
-## 📝 開發指南
-
-### 新增組件
-
-```bash
-ng generate component component-name
-```
-
-### 新增服務
-
-```bash
-ng generate service service-name
-```
-
-## 🤝 貢獻
-
-歡迎提交 Issues 和 Pull Requests！
-
-1. Fork 此專案
-2. 創建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 開啟 Pull Request
 
 ## 📄 License
 
@@ -146,7 +124,7 @@ ng generate service service-name
 
 ## 👨‍💻 作者
 
-- **你的名字** - _初始開發_ - [你的 GitHub](https://github.com/your-username)
+- **lily huang** - _初始開發_ - [你的 GitHub](https://github.com/your-username)
 
 ## 🙏 致謝
 
