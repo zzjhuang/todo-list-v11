@@ -1,0 +1,45 @@
+<div
+  class="container-fluid d-flex justify-content-center align-items-center min-vh-100"
+>
+  <div class="col-md-4 col-sm-6">
+    <div class="card shadow">
+      <div class="card-body">
+        <h3 class="card-title text-center mb-4">登入</h3>
+        <!-- 查一下綁定機制 -->
+        <form #form="ngForm" (submit)="onLogin()">
+          <div class="mb-3">
+            <label for="username" class="form-label">帳號</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              placeholder="請輸入帳號"
+              [(ngModel)]="username"
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">密碼</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="請輸入密碼"
+              [(ngModel)]="password"
+            />
+          </div>
+          <div class="">
+            <p>還沒有帳號？<a routerLink="/register">點我註冊</a></p>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
+              <i class="bi bi-box-arrow-in-right me-2"></i>登入
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,334 @@
+<div class="todo-container" style="margin: 20px">
+  <div class="todo-header" style="margin-top: 10px">
+    <ul
+      style="
+        list-style-type: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      "
+    >
+      <li style="display: flex; align-items: center; gap: 5px">
+        <h2 style="font-size: 12pt">Hello {{ username }}!</h2>
+        <button *ngIf="username" class="btn btn-danger" (click)="logout()">
+          登出
+        </button>
+        <button *ngIf="!username" class="btn btn-primary" (click)="login()">
+          登入
+        </button>
+      </li>
+      <li>
+        <h3 style="font-size: 12pt">
+          今天日期: {{ today | date : "fullDate" }}
+        </h3>
+      </li>
+      <li>
+        <button class="btn btn-success" (click)="addTodo()">
+          新增待辦事項
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div class="todosection">
+    <div>
+      <!-- 新增表單的燈箱 -->
+      <ng-container *ngIf="isModalOpen" (modalClose)="closeModal()">
+        <!-- 監聽子組件的關閉事件 -->
+        <app-add-todo
+          *ngIf="isModalOpen"
+          [todoToEdit]="todoToEdit"
+          (modalClose)="closeModal()"
+        ></app-add-todo>
+      </ng-container>
+    </div>
+
+    <!-- 代辦放這邊-->
+    <div *ngIf="!username">
+      <div style="text-align: center">請先登入以查看待辦事項</div>
+    </div>
+    <div *ngIf="username">
+      <!-- 頁籤導航 -->
+      <ul class="nav nav-tabs" style="margin-bottom: 20px">
+        <!-- [class.className]="條件表達式"用來動態綁定CSS-->
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="activeTab === 'pending'"
+            (click)="activeTab = 'pending'"
+            style="cursor: pointer"
+          >
+            未完成 ({{ getPendingTodos().length }})
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="activeTab === 'completed'"
+            (click)="activeTab = 'completed'"
+            style="cursor: pointer"
+          >
+            已完成 ({{ getCompletedTodos().length }})
+          </a>
+        </li>
+      </ul>
+
+      <!-- 畫面左欄放排序篩選功能 -->
+      <div class="todo-tools" style="width: 20%">
+        <div class="todo-filters" style="float: left; margin-right: 20px">
+          <label for="filterType" style="display: block; margin-bottom: 5px"
+            >篩選類型</label
+          >
+          <select
+            id="filterType"
+            [(ngModel)]="filterType"
+            name="filterType"
+            class="form-control"
+            style="margin-bottom: 10px"
+          >
+            <option value="">顯示全部</option>
+            <option value="category">依分類篩選</option>
+            <option value="priority">依優先度篩選</option>
+          </select>
+
+          <div *ngIf="filterType === 'category'">
+            <label style="display: block; margin-bottom: 10px">選擇分類:</label>
+            <div style="margin-bottom: 8px">
+              <input
+                type="radio"
+                value="工作"
+                name="categoryFilter"
+                [(ngModel)]="selectedCategory"
+              />
+              <label for="category-work" style="margin-left: 5px">工作</label>
+            </div>
+            <div style="margin-bottom: 8px">
+              <input
+                type="radio"
+                value="生活"
+                name="categoryFilter"
+                [(ngModel)]="selectedCategory"
+              />
+              <label for="category-life" style="margin-left: 5px">生活</label>
+            </div>
+            <div style="margin-bottom: 8px">
+              <input
+                type="radio"
+                value="娛樂"
+                name="categoryFilter"
+                [(ngModel)]="selectedCategory"
+              />
+              <label for="category-entertainment" style="margin-left: 5px"
+                >娛樂</label
+              >
+            </div>
+          </div>
+          <div *ngIf="filterType === 'priority'">
+            <label style="display: block; margin-bottom: 10px"
+              >選擇優先度:</label
+            >
+            <div style="margin-bottom: 8px">
+              <input
+                type="radio"
+                value="high"
+                name="priorityFilter"
+                [(ngModel)]="selectedPriority"
+              />
+
+              <label for="priority-high" style="margin-left: 5px">高</label>
+            </div>
+            <div style="margin-bottom: 8px">
+              <input
+                type="radio"
+                value="normal"
+                name="priorityFilter"
+                [(ngModel)]="selectedPriority"
+              />
+
+              <label for="priority-normal" style="margin-left: 5px">中</label>
+            </div>
+            <div style="margin-bottom: 8px">
+              <input
+                type="radio"
+                value="low"
+                name="priorityFilter"
+                [(ngModel)]="selectedPriority"
+              />
+
+              <label for="priority-low" style="margin-left: 5px">低</label>
+            </div>
+          </div>
+        </div>
+        <div class="sort" style="float: left; margin-right: 20px">
+          <label for="sortType" style="display: block; margin-bottom: 5px"
+            >排序方式</label
+          >
+          <select
+            id="sortType"
+            [(ngModel)]="sortType"
+            name="sortType"
+            class="form-control"
+            style="margin-bottom: 10px"
+          >
+            <option value="">無排序</option>
+            <option value="dueDate">依截止日期</option>
+            <option value="priority">依優先度</option>
+            <option value="setupTime">依建立日期</option>
+          </select>
+
+          <div *ngIf="sortType">
+            <label style="display: block; margin-bottom: 5px">排序順序:</label>
+            <div>
+              <input
+                type="radio"
+                value="asc"
+                name="sortOrder"
+                [(ngModel)]="sortOrder"
+              />
+              <label style="margin-left: 5px">升序</label>
+            </div>
+            <div>
+              <input
+                type="radio"
+                value="desc"
+                name="sortOrder"
+                [(ngModel)]="sortOrder"
+              />
+              <label style="margin-left: 5px">降序</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 畫面右欄放待辦清單 -->
+      <div class="todo-list" style="width: 75%; margin-left: auto">
+        <!-- 未完成頁籤內容 -->
+        <div *ngIf="activeTab === 'pending'">
+          <div *ngFor="let item of getPendingTodos()">
+            <div
+              class="todoPending"
+              style="
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                background-color: rgb(217, 236, 241);
+                width: auto;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 10px;
+                position: relative;
+                gap: 20px;
+              "
+            >
+              <div
+                style="
+                  position: absolute;
+                  top: 10px;
+                  right: 5px;
+                  display: flex;
+                  gap: 20px;
+                "
+              >
+                <div
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  name="close-btn"
+                  (click)="updateTodo(item)"
+                >
+                  修改
+                </div>
+                <button
+                  class="btn btn-outline-danger btn-sm rounded-circle"
+                  name="close-btn"
+                  (click)="removeTodo(item)"
+                >
+                  &times;
+                </button>
+              </div>
+              <div>
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [checked]="item.done"
+                  (change)="toggleTodoDone(item)"
+                />
+              </div>
+              <div>
+                <h4>{{ item.title }}</h4>
+                <p>截止日期: {{ item.dueDate | date : "fullDate" }}</p>
+                <p>分類: {{ item.category }}</p>
+                <p>優先級: {{ item.priority }}</p>
+                <p>備註: {{ item.description }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- 沒有未完成待辦事項時 -->
+          <div
+            *ngIf="getPendingTodos().length === 0"
+            style="
+              margin: auto;
+              width: fit-content;
+              text-align: center;
+              padding: 40px;
+            "
+          >
+            <p>🎉 目前沒有未完成的待辦事項</p>
+          </div>
+        </div>
+
+        <!-- 已完成頁籤內容 -->
+        <div *ngIf="activeTab === 'completed'">
+          <div *ngFor="let item of getCompletedTodos()">
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                background-color: rgb(214, 214, 214);
+                width: auto;
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 10px;
+                position: relative;
+                gap: 20px;
+              "
+            >
+              <button
+                class="btn btn-outline-danger btn-sm rounded-circle"
+                name="close-btn"
+                (click)="removeTodo(item)"
+                style="position: absolute; top: 5px; right: 5px"
+              >
+                &times;
+              </button>
+              <input
+                class="form-check-input"
+                type="checkbox"
+                [checked]="item.done"
+                (change)="toggleTodoDone(item)"
+              />
+              <div>
+                <h4>{{ item.title }}</h4>
+                <p>截止日期: {{ item.dueDate | date : "fullDate" }}</p>
+                <p>分類: {{ item.category }}</p>
+                <p>優先級: {{ item.priority }}</p>
+                <p>備註: {{ item.description }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- 沒有已完成待辦事項時 -->
+          <div
+            *ngIf="getCompletedTodos().length === 0"
+            style="
+              margin: auto;
+              width: fit-content;
+              text-align: center;
+              padding: 40px;
+            "
+          >
+            <p>還沒有完成任何待辦事項</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

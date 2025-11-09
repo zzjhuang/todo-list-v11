@@ -1,0 +1,124 @@
+<div
+  class="modal-backdrop"
+  style="
+    width: 500px;
+    height: auto;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    position: absolute;
+    left: 30%;
+    top: 10%;
+    align-items: center;
+    margin: auto;
+    padding: 20px;
+  "
+>
+  <div class="modal-content">
+    <div
+      class="modal-header"
+      style="display: flex; justify-content: space-between; align-items: center"
+    >
+      <h4>{{ todoToEdit ? "修改待辦事項" : "新增待辦事項" }}</h4>
+      <button class="btn btn-danger btn-sm rounded-circle" (click)="onClose()">
+        &times;
+      </button>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-group">
+        <label for="title">標題 *</label>
+        <input
+          type="text"
+          id="title"
+          [(ngModel)]="todoTitle"
+          name="title"
+          #title="ngModel"
+          class="form-control"
+          placeholder="請輸入待辦事項標題"
+          required
+        />
+        <span
+          *ngIf="title.hasError('required')"
+          style="color: red; font-size: 12px"
+          >標題為必填</span
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="dueDate">截止日期</label>
+        <input
+          type="date"
+          id="dueDate"
+          [min]="today"
+          [(ngModel)]="todoDueDate"
+          name="dueDate"
+          #dueDate="ngModel"
+          class="form-control"
+        />
+        <span
+          *ngIf="dueDate.hasError('required')"
+          style="color: red; font-size: 12px"
+          >截止日期為必填</span
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="category">分類</label>
+        <select
+          id="category"
+          [(ngModel)]="todoCategory"
+          name="category"
+          #category="ngModel"
+          class="form-control"
+        >
+          <option value=" ">請選擇分類</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+        <span
+          *ngIf="category.hasError('required')"
+          style="color: red; font-size: 12px"
+          >分類為必填</span
+        >
+      </div>
+
+      <div class="form-group" style="display: flex; flex-direction: column">
+        <label for="description">描述</label>
+        <textarea
+          id="description"
+          [(ngModel)]="todoDescription"
+          name="description"
+          class="form-control"
+          placeholder="請輸入詳細描述"
+          rows="3"
+        >
+        </textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="priority">優先級</label>
+        <select
+          id="priority"
+          [(ngModel)]="todoPriority"
+          name="priority"
+          class="form-control"
+        >
+          <option value="low">低</option>
+          <option value="normal">普通</option>
+          <option value="high">高</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onClose()">
+          取消
+        </button>
+        <button type="submit" class="btn btn-primary">
+          {{ todoToEdit ? "更新" : "新增" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+# 當推送到 main 分支時觸發
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 設定權限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允許一個並發部署
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # 構建工作
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 代碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Node.js 環境
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+          cache: "npm"
+
+      - name: 安裝依賴
+        run: npm ci
+
+      - name: 構建專案
+        run: ng build --configuration production --base-href="/todo-list-v11/"
+
+      - name: 設定 GitHub Pages
+        uses: actions/configure-pages@v3
+
+      - name: 上傳建構文件
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: "./dist/todo-list-v11"
+
+  # 部署工作
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
